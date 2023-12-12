@@ -1,0 +1,41 @@
+---
+
+#check command: mysql -u root -h localhost -p
+
+- hosts: mysql
+
+  vars:
+    root_password: "test"
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Installing Mysql
+      package:
+         name: "{{item}}"
+         state: present
+         update_cache: yes
+      loop:
+        - mysql-server
+        - mysql-client
+        - python3-mysqldb
+        - libmysqlclient-dev
+      become: yes
+
+    - name: start and enable mysql service
+      service:
+         name: mysql
+         state: started
+         enabled: yes
+
+    - name: Set root user password
+      mysql_user:
+        name: root
+        password: "{{root_password}}"
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+        host: localhost
+        login_user: root
+        login_password: ''
+        state: present
