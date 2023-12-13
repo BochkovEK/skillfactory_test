@@ -1,0 +1,21 @@
+---
+- hosts: postfix
+
+  vars:
+    postfix_relay_deb_pkgs:
+      - postfix
+      - libsasl2-2
+
+  tasks:
+    - name: postfix | install
+      apt: pkg=postfix state=latest update_cache=yes
+      tags: "init postfix"
+
+    - name: postfix | ensure service is running
+      service: name=postfix state=started
+      tags: "init postfix"
+
+    - name: Remove postfix and libsas on deb systems
+      action: apt pkg={{ postfix_relay_deb_pkgs }} state=absent
+      when: ansible_distribution_file_variety == "Debian"
+      tags: "drop postfix"
