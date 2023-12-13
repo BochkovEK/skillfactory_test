@@ -2,8 +2,21 @@
 - hosts: "dev"
   vars:
     user: "user1"
+    key_folder_src: "./id_rsa*"
+    key_folder_dest: "/home/{{ user }}/.ssh/"
+
   tasks:
-    - name: "Create user accounts"
+    - name: Create user accounts
       user:
         name: "{{ user }}"
-        groups: "admin"
+        groups: "sudo"
+    - name: Display paths of all .txt files in dir
+      ansible.builtin.debug: msg={{ lookup('ansible.builtin.fileglob', "{{ key_folder_src }}") }}
+    - name: Copy file with owner and permissions
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "{{ key_folder_dest }}"
+        owner: "{{ user }}"
+        mode: "0600"
+      with_fileglob:
+        - "{{ key_folder_src }}"
