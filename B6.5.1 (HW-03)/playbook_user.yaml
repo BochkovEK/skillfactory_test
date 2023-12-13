@@ -1,0 +1,9 @@
+---
+- hosts: "dev"
+  vars:
+    user: "user1"
+  tasks:
+    - name: "Create user accounts"
+      user:
+        name: "{{ user }}"
+        groups: "admin"
