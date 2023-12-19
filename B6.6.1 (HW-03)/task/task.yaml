@@ -1,0 +1,38 @@
+---
+# tasks file for vsftpd
+- name: install vsftpd package (Ubuntu)
+  apt:
+    name: vsftpd
+  when: ansible_facts['distribution']=="Ubuntu"
+
+- name: install vsftpd package (Centos)
+  debug:
+    msg: "Installing to Centos OS..."
+  when: ansible_facts['distribution']=="CentOS"
+
+- name: copy config from template
+  template:
+    src: "templates/{{ config_file }}.j2"
+    dest: /etc/{{ config_file }}
+    mode: 0640
+
+- name: Allow everything and enable UFW
+  community.general.ufw:
+    state: enabled
+    policy: allow
+
+- name: Allow all access to tcp port 20,21,990
+  community.general.ufw:
+    rule: allow
+    port: '20,21,990'
+    proto: tcp
+
+- name: create {{ user }} user for ftp server
+  user:
+    name: "{{ user }}"
+    password: "{{ password | password_hash('sha512')}}"
+
+- name: Start service vsftpd, if not started
+  service:
+    name: vsftpd
+    state: started
