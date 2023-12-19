@@ -1,0 +1,28 @@
+---
+- hosts:
+    - nameserver
+  become: yes
+  vars:
+    - domain: example.com
+
+  roles:
+    - role: dnsmasq
+      vars:
+        dnsmasq_overlay_1:  |
+          domain={{ domain }}
+          local=/{{ domain }}/
+          addn-hosts=/etc/hosts.dnsmasq
+          resolv-file=/etc/resolv.conf.upstream
+
+          dhcp-range=192.168.1.210,192.168.1.250,12h
+          dhcp-option=option:router,192.168.1.1
+          dhcp-option=option:dns-server,192.168.1.201
+          dhcp-option=option:netmask,255.255.255.0
+
+          #dhcp-host=00:50:56:01:23:45,192.168.1.201
+          dhcp-host=192.168.1.201
+
+        hosts_dnsmasq_1: |
+          address=/ubuntu2.{{ domain }}/192.168.1.202
+          address=/ubuntu1.{{ domain }}/192.168.1.201
+          address=/ubuntu.{{ domain }}/192.168.1.200
