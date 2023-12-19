@@ -1,0 +1,61 @@
+---
+
+- name: Install dnsmasq and dependencies
+  package:
+    name: ['dnsmasq', 'dnsutils']
+
+- name: Set hostname fact
+  set_fact:
+    hostname_alias1: "{{ ansible_hostname }}"
+
+- name: Dnsmasq overlay config
+  lineinfile:
+    dest: /etc/dnsmasq.conf
+    regexp: '^conf-dir=/etc/dnsmasq.d.*'
+    line: conf-dir=/etc/dnsmasq.d/,*.conf
+
+- name: Build overlay-conf1
+  template:
+    src: templates/etc/dnsmasq.d/overlay1.conf.j2
+    dest: /etc/dnsmasq.d/overlay1.conf
+
+- name: Build hosts.dnsmasq
+  template:
+    src: templates/etc/hosts.dnsmasq.j2
+    dest: /etc/hosts.dnsmasq
+
+- name: Copy /etc/resolv.conf.upstream
+  copy:
+    src: /etc/resolv.conf
+    dest: /etc/resolv.conf.upstream
+    force: false
+    remote_src: true
+
+- name: Empty leases
+  file:
+    path: /var/lib/dnsmasq/dnsmasq.leases
+    state: absent
+
+- name: Ensure dnsmasq is enabled
+  systemd:
+    name: dnsmasq
+    masked: no
+    enabled: yes
+
+- name: Allow all access to tcp port 5353
+  community.general.ufw:
+    rule: allow
+    port: '5353'
+    proto: udp
+
+- name: Disable systemd-resolved
+  ansible.builtin.systemd:
+    name: systemd-resolved
+    enabled: false
+    masked: yes
+
+- name: Restart services
+  command: /bin/true
+  check_mode: false
+  notify:
+    - Restart dnsmasq
