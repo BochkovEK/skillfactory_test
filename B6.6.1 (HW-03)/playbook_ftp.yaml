@@ -1,0 +1,5 @@
+---
+- hosts: vsFTPd
+  become: yes
+  roles:
+  - vsftpd
