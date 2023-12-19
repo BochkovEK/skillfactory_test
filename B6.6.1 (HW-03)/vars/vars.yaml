@@ -1,0 +1,6 @@
+---
+# vars file for vsftpd
+
+user: "petr"
+password: "test"
+config_file: "vsftpd.conf"
