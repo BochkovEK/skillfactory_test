@@ -2,5 +2,7 @@
 #ubuntu-ansible-test-1 ansible_host=192.168.1.201
 
 [sudousers]
-ubuntu-ansible-test-1 ansible_host=192.168.1.201
+#ubuntu-ansible-test-1 ansible_host=192.168.1.201
 
+[lemp]
+ubuntu-ansible-test-1 ansible_host=192.168.1.201
