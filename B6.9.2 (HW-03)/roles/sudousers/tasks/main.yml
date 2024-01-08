@@ -1,0 +1,25 @@
+---
+
+- name: Check sudo group
+  group:
+    name: sudo
+    state: present
+
+- name: Add the users with a bash shell, appending the group 'sudo' to the user's groups
+  user:
+    name: "{{ item }}"
+    update_password: always
+    password: "{{ password | string | password_hash('sha512') }}"
+    createhome: yes
+    shell: /bin/bash
+    groups: sudo
+    append: yes
+  with_items: "{{ users_name }}"
+
+- name: Validate the sudoers file before saving
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: '^%ADMIN ALL='
+    line: '%ADMIN ALL=(ALL) NOPASSWD: ALL'
+    validate: /usr/sbin/visudo -cf %s
