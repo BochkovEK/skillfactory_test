@@ -3,7 +3,7 @@
     - nameserver
   become: yes
   vars:
-    - domain: example.com
+    domain: example.com
 
   roles:
     - role: dnsmasq
@@ -43,3 +43,9 @@
         users_name:
           - user2
           - user3
+
+- hosts:
+    - lemp
+  become: yes
+  roles:
+    - role: lemp
