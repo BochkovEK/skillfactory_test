@@ -28,7 +28,7 @@
 
 # MySQL Configuration
 
-- name: "Setting ROOT password for mariadb-server"
+- name: "Setting ROOT password for mysql-server"
   ignore_errors: true
   mysql_user:
     login_user: "root"
