@@ -1,0 +1,13 @@
+---
+
+- hosts:
+    - nginx
+  roles:
+    - role: users
+    - role: http
+
+- hosts:
+    - phpfpm
+  roles:
+    - role: users
+    - role: php

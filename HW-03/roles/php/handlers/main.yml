@@ -1,0 +1,6 @@
+---
+
+- name: Restart php-fpm
+  systemd:
+    name: "php{{ php_version }}-fpm"
+    state: restarted

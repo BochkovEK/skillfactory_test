@@ -1,0 +1,7 @@
+[nginx]
+ubuntu-ansible-test-1 ansible_host=192.168.1.201
+
+[phpfpm]
+ubuntu-ansible-test-2 ansible_host=192.168.1.202
+
+

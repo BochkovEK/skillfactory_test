@@ -1,0 +1,14 @@
+---
+
+- name: "Add user {{ user_name }}"
+  user:
+    name: "{{ user_name }}"
+
+- name: Set authorized key for {{ user_name }} took from file
+  tags: system-user
+  authorized_key:
+    user: "{{ user_name }}"
+    state: present
+    key: '{{ item }}'
+  with_file:
+    - pub_keys/pub_key_from_main_server

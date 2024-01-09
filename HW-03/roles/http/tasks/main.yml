@@ -1,0 +1,27 @@
+---
+
+- name: Install nginx
+  apt:
+    pkg: nginx
+    state: latest
+
+# Nginx Configuration
+
+- name: Sets Nginx conf file
+  template:
+    src: "templates/nginx.conf.j2"
+    dest: "/etc/nginx/sites-enabled/{{ my_domain }}.conf"
+  notify: Restart nginx
+
+- name: Removes "default" site
+  file:
+    path: "/etc/nginx/sites-enabled/default"
+    state: absent
+  notify: Restart nginx
+
+- name: Create fake page on nginx server
+  template:
+    src: "templates/info.php.j2"
+    dest: "{{ www_root_path }}/info.php"
+  notify: Restart nginx
+
