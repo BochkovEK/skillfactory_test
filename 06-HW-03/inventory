@@ -1,0 +1,13 @@
+[app]
+vm2stored1 ansible_host=10.128.0.17
+vm3stored1 ansible_host=10.128.0.8
+
+[database]
+vm1 ansible_host=127.0.0.1
+
+[web]
+vm1 ansible_host=127.0.0.1
+
+[database:vars]
+pg_version="14"
+pg_data_dir="/pgdata"

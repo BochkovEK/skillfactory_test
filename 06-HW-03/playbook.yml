@@ -1,0 +1,93 @@
+---
+
+# Install docker
+
+- hosts: app
+  become: true
+  tasks:
+
+    - name: Install Docker on ContOS
+      block:
+        - name: Install yum-utils
+          yum:
+            name: yum-utils
+            state: latest
+
+        - name: Add docker repository
+          shell:
+            cmd: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+        - name: Install Docker and requirements
+          yum:
+            name: "{{ item }}"
+            state: latest
+          loop: ['docker-ce', 'docker-ce-cli', 'containerd.io', 'docker-buildx-plugin', 'docker-compose-plugin']
+
+      when: (ansible_distribution == 'CentOS' and ansible_distribution_major_version == '8')
+
+    - name: Install Docker on Ubuntu
+      block:
+        - name: Add Docker GPG apt Key
+          apt_key:
+            url: https://download.docker.com/linux/ubuntu/gpg
+            state: present
+
+        - name: Add Docker Repository
+          apt_repository:
+            repo: deb https://download.docker.com/linux/ubuntu focal stable
+            state: present
+
+        - name: Update apt and install docker-ce
+          apt:
+            name: docker-ce
+            state: latest
+            update_cache: true
+
+      when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
+
+    - name: Make sure a Docker is running
+      service:
+        name: docker
+        state: started
+
+# Install postgresql-server
+
+- hosts: database
+  become: true
+  tasks:
+    - name: "Install postgresql {{ pg_version }}"
+      apt:
+        name: "postgresql-{{ pg_version }}"
+        update_cache: yes
+
+    - name: Stop pg service
+      service:
+        name: postgresql
+        state: stopped
+
+    - name: "Create a data directory {{ pg_data_dir }}"
+      file:
+        path: "{{ pg_data_dir }}"
+        state: directory
+        owner: postgres
+        group: postgres
+
+    - name: "Synchronization {{ pg_data_dir }}"
+      shell:
+        cmd: "rsync -av /var/lib/postgresql {{ pg_data_dir }}"
+
+    - name: Move main to main.bak
+      shell:
+        cmd: "mv /var/lib/postgresql/{{ pg_version }}/main /var/lib/postgresql/{{ pg_version }}/main.bak"
+      ignore_errors: true
+
+    - replace:
+        path: "/etc/postgresql/{{ pg_version }}/main/postgresql.conf"
+        regexp: "/var/lib/postgresql/{{ pg_version }}/main"
+        replace: "{{ pg_data_dir }}/postgresql/{{ pg_version }}/main"
+        backup: yes
+
+    - name: Start pg service
+      service:
+        name: postgresql
+        state: started
