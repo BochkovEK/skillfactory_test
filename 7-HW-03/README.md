@@ -1,6 +1,6 @@
 1) Start on remote host:
 ansible-playbook playbook.yml
-2) Start build.sh from build_python3_docker_image folder от postgresql host
+2) Start build.sh from build_python3_docker_image folder on postgresql host
     - build docker image python3-flask:mytag
     - run docker from python3-flask:mytag
 
