@@ -1,0 +1,9 @@
+[database]
+ubuntu-ansible-test-1 ansible_host=192.168.1.201
+
+[database:vars]
+pg_version="14"
+db_host = 'ubuntu-ansible-test-1'
+db_user = 'test-user'
+db_password = 'password'
+db_name = 'test-database'
