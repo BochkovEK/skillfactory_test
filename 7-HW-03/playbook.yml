@@ -3,64 +3,64 @@
 - hosts: database
   become: true
   tasks:
-#    - name: "Install postgresql {{ pg_version }}"
-#      apt:
-#        name: "postgresql-{{ pg_version }}"
-#        update_cache: yes
-#
-#    - name: Install Python pip
-#      apt:
-#        name: "{{ item }}"
-#        update_cache: true
-#        state: present
-#        force_apt_get: yes
-#      with_items:
-#        - python3-pip
-#        - python3-psycopg2
-#        - libpq-dev
-#
-#    - name: "Create app database"
-#      postgresql_db:
-#        state: present
-#        name: "{{ db_name }}"
-#      become: yes
-#      become_user: postgres
-#
-#    - name: "Create db user"
-#      postgresql_user:
-#        state: present
-#        name: "{{ db_user }}"
-#        password: "{{ db_password }}"
-#      become: yes
-#      become_user: postgres
-#
-#    - name: "Grant db user access to app db"
-#      postgresql_privs:
-#        type: database
-#        database: "{{ db_name }}"
-#        roles: "{{ db_user }}"
-#        grant_option: no
-#        privs: all
-#      become: yes
-#      become_user: postgres
-#
-#    - name: Install Docker on Ubuntu
-#      block:
-#        - name: Add Docker GPG apt Key
-#          apt_key:
-#            url: https://download.docker.com/linux/ubuntu/gpg
-#            state: present
-#
-#        - name: Add Docker Repository
-#          apt_repository:
-#            repo: deb https://download.docker.com/linux/ubuntu focal stable
-#            state: present
-#
-#        - name: Update apt and install docker-ce
-#          apt:
-#            name: docker-ce
-#            state: latest
-#            update_cache: true
+   - name: "Install postgresql {{ pg_version }}"
+     apt:
+       name: "postgresql-{{ pg_version }}"
+       update_cache: yes
+
+   - name: Install Python pip
+     apt:
+       name: "{{ item }}"
+       update_cache: true
+       state: present
+       force_apt_get: yes
+     with_items:
+       - python3-pip
+       - python3-psycopg2
+       - libpq-dev
+
+   - name: "Create app database"
+     postgresql_db:
+       state: present
+       name: "{{ db_name }}"
+     become: yes
+     become_user: postgres
+
+   - name: "Create db user"
+     postgresql_user:
+       state: present
+       name: "{{ db_user }}"
+       password: "{{ db_password }}"
+     become: yes
+     become_user: postgres
+
+   - name: "Grant db user access to app db"
+     postgresql_privs:
+       type: database
+       database: "{{ db_name }}"
+       roles: "{{ db_user }}"
+       grant_option: no
+       privs: all
+     become: yes
+     become_user: postgres
+
+   - name: Install Docker on Ubuntu
+     block:
+       - name: Add Docker GPG apt Key
+         apt_key:
+           url: https://download.docker.com/linux/ubuntu/gpg
+           state: present
+
+       - name: Add Docker Repository
+         apt_repository:
+           repo: deb https://download.docker.com/linux/ubuntu focal stable
+           state: present
+
+       - name: Update apt and install docker-ce
+         apt:
+           name: docker-ce
+           state: latest
+           update_cache: true
 
     - name: Copy Dockerfile dir
       copy:
