@@ -4,6 +4,6 @@ ansible-playbook playbook.yml
     - build docker image python3-flask:mytag
     - run docker from python3-flask:mytag
 
-build_python3_docker_image/app - app folder
-build_python3_docker_image/build.sh - - build docker image and run docker from python3-flask:mytag
-build_python3_docker_image/source.bash - env variables
+- build_python3_docker_image/app - app folder
+- build_python3_docker_image/build.sh - - build docker image and run docker from python3-flask:mytag
+- build_python3_docker_image/source.bash - env variables
