@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  nginx:
+    image: "${NGINX_TAG}"
+    ports:
+      - "80:80"
+    volumes:
+      - /root/skillfactory_test/86-HW-03/www:/var/www
+      - /root/skillfactory_test/86-HW-03/nginx:/etc/nginx/conf.d
+    restart: always
+  php:
+    image: "${PHP_TAG}"
+    volumes:
+      - /skillfactory_test/86-HW-03/www:/var/www
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "curl http://nginx/index.php|grep 'works'" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
