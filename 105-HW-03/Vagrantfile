@@ -1,0 +1,40 @@
+ENV['VAGRANT_SERVER_URL'] = 'http://vagrant.elab.pro'
+
+VAGRANTFILE_API_VERSION = "2"
+
+$script = <<SCRIPT
+  psql_version=10
+  echo "-------------------- updating package lists"
+  #apt-get update
+  # gotta put this before the upgrade, b/c it reboots and then all commands are lost
+  echo "-------------------- installing postgres"
+  apt-get install -y postgresql
+  # fix permissions
+  echo "-------------------- fixing listen_addresses on postgresql.conf"
+  sudo sed -i "s/#listen_address.*/listen_addresses '*'/" /etc/postgresql/${psql_version}/main/postgresql.conf
+  echo "-------------------- fixing postgres pg_hba.conf file"
+  # replace the ipv4 host line with the above line
+  sudo cat >> /etc/postgresql/${psql_version}/main/pg_hba.conf <<EOF
+  # Accept all IPv4 connections - FOR DEVELOPMENT ONLY!!!
+  host    all         all         0.0.0.0/0             md5
+EOF
+  echo "-------------------- restart postgresql service"
+  sudo systemctl restart postgresql
+
+  #apt-get upgrade -y
+SCRIPT
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = "ubuntu/bionic64"
+  config.vm.network :forwarded_port, guest: 5432, host: 5433
+  config.vm.synced_folder "C:/Users/bochk/Vagrant/Postgresql/pg_backup_driver", "/pg_backup_driver"
+
+# Run the shell script inline provisioner
+  config.vm.provision "shell", inline: $script
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+    vb.memory = "2024"
+    vb.cpus = 2
+  end
+end
