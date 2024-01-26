@@ -1,0 +1,26 @@
+ENV['VAGRANT_SERVER_URL'] = 'http://vagrant.elab.pro'
+
+VAGRANTFILE_API_VERSION = "2"
+
+$script = <<SCRIPT
+  echo "-------------------- updating package lists"
+  apt-get update
+  echo "-------------------- installing pip3"
+  sudo apt-get install -y python3-pip
+  echo "-------------------- installing django psycopg"
+  sudo -H pip3 install --trusted-host pypi.python.org django psycopg
+SCRIPT
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = "ubuntu/bionic64"
+  config.vm.synced_folder "C:/Users/bochk/Vagrant/Python/scripts_files", "/home/vagrant/scripts_files", create: true
+
+# Run the shell script inline provisioner
+  config.vm.provision "shell", inline: $script
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+    vb.memory = "2024"
+    vb.cpus = 2
+  end
+end
