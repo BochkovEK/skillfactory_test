@@ -1,0 +1,12 @@
+stages:
+    - sql
+
+stage_sql:
+    stage: sql
+    image: 
+        name: logiqx/mysql-client
+    script:
+        - mysql --user rfamro --host mysql-rfam-public.ebi.ac.uk --port 4497 --database Rfam < test.sql
+        - echo "Hello Gitlab"
+    tags:
+        - docker-runner
