@@ -1,0 +1,49 @@
+variables:
+  NGINX_URL: "http://my-nginx.local:9889"
+  CONTROL_FILE: ./www/index.html
+#   CONTROL_FILE: index_copy.html
+  CHAT_ID: -4125935143
+
+stages:
+    - nginx-docker-up
+    - http-request
+    - check-md5
+    - nginx-docker-delete
+
+nginx-docker-up:
+    stage: nginx-docker-up
+    tags:
+    - ansible-runner
+    script:
+    - echo "Hello Gitlab"
+    - export ANSIBLE_CONFIG=ansible.cfg
+    - ansible-playbook playbook.yml --tags wip-nginx-docker -i inventory
+
+http-request:
+    stage: http-request
+    tags:
+    - shell-runner
+    script:
+    - sh check_script.sh check_curl_responce_code
+
+check-md5:
+    stage: check-md5
+    tags:
+    - shell-runner
+    script:
+    # - echo $CONTROL_FILE
+    # - echo $TELEGRAM_BOT_TOKEN
+    - sh check_script.sh check_md5
+
+nginx-docker-delete:
+    stage: nginx-docker-delete
+    tags:
+    - ansible-runner
+    script:
+    - export ANSIBLE_CONFIG=ansible.cfg
+    - ansible-playbook playbook.yml --tags remove-nginx-docker -i inventory
+
+
+
+
+    

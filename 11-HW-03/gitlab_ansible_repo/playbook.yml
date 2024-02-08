@@ -1,0 +1,64 @@
+---
+
+- hosts: nginx
+  
+  tasks:
+
+    # - name: Check command
+    #   shell:
+    #     cmd: ls -la
+    #   register: cmd_qa_out
+    
+  - name: Work with nginx docker
+    block:
+    - name: Create nginx directory
+      file:
+        path: /opt/nginx
+        state: directory
+    
+    - name: Create www directory
+      file:
+        path: /opt/www
+        state: directory
+    
+    - name: Copy nginx folder from repo to host
+      copy:
+        src: ./nginx/
+        dest: /opt/nginx
+    
+    - name: Copy www folder from repo to host
+      copy:
+        src: ./www/
+        dest: /opt/www
+        
+    - name: Create nginx container
+      docker_container:
+        name: nginx
+        image: nginx
+        volumes:
+        - /opt/www:/var/www
+        - /opt/nginx:/etc/nginx/conf.d
+        ports:
+        - "9889:80"
+        restart: true
+    
+    tags:
+    - wip-nginx-docker
+
+  - name: Remove nginx docker
+    block:
+    - name: Stop nginx container
+      docker_container:
+        name: nginx
+        state: stopped
+      
+    - name: Remove nginx container
+      docker_container:
+        name: "nginx"
+        state: absent
+    
+    tags:
+    - remove-nginx-docker
+
+    # - debug: 
+        # msg: "{{ cmd_qa_out }}"
