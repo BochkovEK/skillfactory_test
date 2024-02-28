@@ -1,0 +1,62 @@
+groups:
+- name: example
+  rules:
+
+  # Alert for any instance that is unreachable for >2 minutes.
+  - alert: service_down
+    expr: up == 0
+    for: 2m
+    labels:
+      severity: page
+    annotations:
+      summary: "Instance {{ $labels.instance }} down"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
+
+  - alert: high_load
+    expr: node_load1 > 0.5
+    for: 2m
+    labels:
+      severity: page
+    annotations:
+      summary: "Instance {{ $labels.instance }} under high load"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} is under high load."
+
+  # HTTP status code is not 200-399
+  - alert: BlackboxProbeHttpFailure
+    expr: probe_http_status_code <= 199 OR probe_http_status_code >= 400
+    for: 0m
+    labels:
+      severity: critical
+    annotations:
+      summary: Blackbox probe HTTP failure (instance {{ $labels.instance }})
+      description: "HTTP status code is not 200-399\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+  # Blackbox probe took more than 5s to complete
+  - alert: BlackboxSlowProbe
+    expr: avg_over_time(probe_duration_seconds[1m]) > 5
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: Blackbox slow probe (instance {{ $labels.instance }})
+      description: "Blackbox probe took more than 5s to complete\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+  # ALERT ON NODE REBOOT
+  - alert: NodeHasRebooted
+    annotations:
+      description: Node has rebooted
+      summary: Node {{ (or $labels.node $labels.instance) }} has rebooted {{ $value }} seconds ago.
+    expr: |
+            (time() - node_boot_time_seconds < 600) and (time() - 600 - (node_boot_time_seconds offset 10m) > 600)
+    labels:
+      severity: critical
+
+  - alert: NodeHasRebooted
+    annotations:
+      description: Node has rebooted
+      summary: Node {{ (or $labels.node $labels.instance) }} has rebooted {{ $value }} seconds ago.
+    expr: |
+            (time() - node_boot_time_seconds < 3600) and (time() - 3600 - (node_boot_time_seconds offset 60m) > 3600)
+    labels:
+      severity: warning
+
